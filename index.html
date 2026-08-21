@@ -8,7 +8,7 @@
 <style>
   body {
     font-family: 'Segoe UI', Arial, sans-serif;
-    background: #3a0066;
+    background: #001f4d;
     color: white;
     text-align: center;
     padding: 40px 20px;
@@ -32,6 +32,7 @@
     width: 160px;
     height: 160px;
     position: relative;
+    perspective: 1000px;
   }
 
   .top, .bottom {
@@ -46,18 +47,17 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1;
   }
 
   .top {
     top: 0;
     border-bottom: 1px solid rgba(255,255,255,0.35);
-    z-index: 1;
   }
 
   .bottom {
     bottom: 0;
     border-top: 1px solid rgba(255,255,255,0.35);
-    z-index: 1;
   }
 
   .flip-top, .flip-bottom {
@@ -75,14 +75,14 @@
   .flip-top {
     top: 0;
     transform-origin: bottom;
-    z-index: 5;
+    z-index: 10;
   }
 
   .flip-bottom {
     bottom: 0;
     transform-origin: top;
     transform: rotateX(180deg);
-    z-index: 5;
+    z-index: 10;
   }
 
   .animate .flip-top {
