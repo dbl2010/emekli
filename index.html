@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Emekliğe Kalan Zaman</title>
+<title>DBL'nin Emekliliğine Kalan Zaman</title>
 
 <style>
   body {
@@ -15,23 +15,23 @@
   }
 
   h1 {
-    font-size: 32px;
-    margin-bottom: 30px;
-    font-weight: 600;
+    font-size: 36px;
+    margin-bottom: 40px;
+    font-weight: 700;
   }
 
   #countdown {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 20px;
-    max-width: 700px;
+    gap: 25px;
+    max-width: 900px;
     margin: 0 auto;
   }
 
   .flip-card {
-    width: 120px;
-    height: 120px;
+    width: 150px;
+    height: 150px;
     perspective: 1000px;
   }
 
@@ -53,7 +53,7 @@
     height: 100%;
     backface-visibility: hidden;
     background: rgba(255,255,255,0.15);
-    border-radius: 12px;
+    border-radius: 16px;
     backdrop-filter: blur(6px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     display: flex;
@@ -67,26 +67,26 @@
   }
 
   .number {
-    font-size: 40px;
+    font-size: 48px;
     font-weight: bold;
   }
 
   .label {
-    font-size: 16px;
+    font-size: 18px;
     opacity: 0.9;
-    margin-top: 5px;
+    margin-top: 8px;
   }
 
   @media (max-width: 480px) {
     .flip-card {
-      width: 90px;
-      height: 90px;
+      width: 120px;
+      height: 120px;
     }
     .number {
-      font-size: 28px;
+      font-size: 36px;
     }
     h1 {
-      font-size: 26px;
+      font-size: 30px;
     }
   }
 </style>
@@ -101,90 +101,13 @@
 <script>
 const targetDate = new Date("2036-02-07T17:00:00");
 
-function createCard(label) {
+function createCard(key, label) {
   const card = document.createElement("div");
   card.className = "flip-card";
+  card.dataset.key = key;
 
   card.innerHTML = `
     <div class="flip-inner">
       <div class="flip-front">
         <div class="number">0</div>
-        <div class="label">${label}</div>
-      </div>
-      <div class="flip-back">
-        <div class="number">0</div>
-        <div class="label">${label}</div>
-      </div>
-    </div>
-  `;
-  return card;
-}
-
-function updateCard(card, newValue) {
-  const front = card.querySelector(".flip-front .number");
-  const back = card.querySelector(".flip-back .number");
-
-  if (front.textContent !== newValue.toString()) {
-    back.textContent = newValue;
-    card.classList.add("flipped");
-
-    setTimeout(() => {
-      front.textContent = newValue;
-      card.classList.remove("flipped");
-    }, 600);
-  }
-}
-
-function updateCountdown() {
-  const now = new Date();
-
-  if (now >= targetDate) {
-    document.getElementById("countdown").innerHTML = "<h2>Süre Doldu!</h2>";
-    return;
-  }
-
-  let years = targetDate.getFullYear() - now.getFullYear();
-  let months = targetDate.getMonth() - now.getMonth();
-  let days = targetDate.getDate() - now.getDate();
-
-  if (days < 0) {
-    months--;
-    const lastMonthDays = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-    days += lastMonthDays;
-  }
-
-  if (months < 0) {
-    years--;
-    months += 12;
-  }
-
-  const hours = 23 - now.getHours();
-  const minutes = 59 - now.getMinutes();
-  const seconds = 59 - now.getSeconds();
-
-  updateCard(cards.year, years);
-  updateCard(cards.month, months);
-  updateCard(cards.day, days);
-  updateCard(cards.hour, hours);
-  updateCard(cards.minute, minutes);
-  updateCard(cards.second, seconds);
-}
-
-const labels = ["Yıl", "Ay", "Gün", "Saat", "Dakika", "Saniye"];
-const cards = {};
-
-const container = document.getElementById("countdown");
-
-labels.forEach(label => {
-  const key = label.toLowerCase();
-  cards[key] = createCard(label);
-  container.appendChild(cards[key]);
-});
-
-setInterval(updateCountdown, 1000);
-updateCountdown();
-</script>
-
-</body>
-</html>
-
+        <div class="label">
