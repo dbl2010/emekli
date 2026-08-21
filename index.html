@@ -1,31 +1,114 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
-  <title>2036 Emekli</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Emekliğe Kalan Zaman</title>
+
   <style>
-    body { font-family: Arial; text-align: center; margin-top: 100px; }
-    #countdown { font-size: 40px; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: white;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 30px;
+      font-weight: 600;
+    }
+
+    #countdown {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .box {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 20px;
+      border-radius: 12px;
+      width: 120px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    .number {
+      font-size: 36px;
+      font-weight: bold;
+    }
+
+    .label {
+      font-size: 16px;
+      margin-top: 5px;
+      opacity: 0.9;
+    }
+
+    @media (max-width: 480px) {
+      .box {
+        width: 100px;
+        padding: 15px;
+      }
+      .number {
+        font-size: 28px;
+      }
+      h1 {
+        font-size: 26px;
+      }
+    }
   </style>
 </head>
+
 <body>
-  <h1>Emekli olmaya kalan vakit</h1>
+  <h1>Emekliğe Kalan Zaman</h1>
+
   <div id="countdown"></div>
 
   <script>
-     const targetDate = new Date("2036-02-07T17:00:00");
+    const targetDate = new Date("2036-02-07T17:00:00");
 
     function updateCountdown() {
       const now = new Date();
-      const diff = targetDate - now;
 
-      const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
-      const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((diff / (1000 * 60)) % 60);
-      const seconds = Math.floor((diff / 1000) % 60);
+      if (now >= targetDate) {
+        document.getElementById("countdown").innerHTML = "<h2>Süre Doldu!</h2>";
+        return;
+      }
 
-      document.getElementById("countdown").innerHTML =
-        `${years} yil ${days} gun ${hours} saat ${minutes} dakika ${seconds} saniye`;
+      let years = targetDate.getFullYear() - now.getFullYear();
+      let months = targetDate.getMonth() - now.getMonth();
+      let days = targetDate.getDate() - now.getDate();
+
+      if (days < 0) {
+        months--;
+        const lastMonthDays = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        days += lastMonthDays;
+      }
+
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+
+      const hours = 23 - now.getHours();
+      const minutes = 59 - now.getMinutes();
+      const seconds = 59 - now.getSeconds();
+
+      const html = `
+        <div class="box"><div class="number">${years}</div><div class="label">Yıl</div></div>
+        <div class="box"><div class="number">${months}</div><div class="label">Ay</div></div>
+        <div class="box"><div class="number">${days}</div><div class="label">Gün</div></div>
+        <div class="box"><div class="number">${hours}</div><div class="label">Saat</div></div>
+        <div class="box"><div class="number">${minutes}</div><div class="label">Dakika</div></div>
+        <div class="box"><div class="number">${seconds}</div><div class="label">Saniye</div></div>
+      `;
+
+      document.getElementById("countdown").innerHTML = html;
     }
 
     setInterval(updateCountdown, 1000);
