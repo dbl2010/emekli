@@ -94,4 +94,103 @@
 
 <body>
 
-<h1>DB
+<h1>DBL'nin Emekliliğine Kalan Zaman</h1>
+
+<div id="countdown"></div>
+
+<script>
+const targetDate = new Date("2036-02-07T17:00:00");
+
+function createCard(key, label) {
+  const card = document.createElement("div");
+  card.className = "flip-card";
+  card.dataset.key = key;
+
+  card.innerHTML = `
+    <div class="flip-inner">
+      <div class="flip-front">
+        <div class="number">0</div>
+        <div class="label">${label}</div>
+      </div>
+      <div class="flip-back">
+        <div class="number">0</div>
+        <div class="label">${label}</div>
+      </div>
+    </div>
+  `;
+  return card;
+}
+
+function updateCard(card, newValue) {
+  const front = card.querySelector(".flip-front .number");
+  const back = card.querySelector(".flip-back .number");
+
+  if (front.textContent !== newValue.toString()) {
+    back.textContent = newValue;
+    card.classList.add("flipped");
+
+    setTimeout(() => {
+      front.textContent = newValue;
+      card.classList.remove("flipped");
+    }, 600);
+  }
+}
+
+function updateCountdown() {
+  const now = new Date();
+
+  if (now >= targetDate) {
+    document.getElementById("countdown").innerHTML = "<h2>Süre Doldu!</h2>";
+    return;
+  }
+
+  let years = targetDate.getFullYear() - now.getFullYear();
+  let months = targetDate.getMonth() - now.getMonth();
+  let days = targetDate.getDate() - now.getDate();
+
+  if (days < 0) {
+    months--;
+    const lastMonthDays = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    days += lastMonthDays;
+  }
+
+  if (months < 0) {
+    years--;
+    months += 12;
+  }
+
+  const hours = 23 - now.getHours();
+  const minutes = 59 - now.getMinutes();
+  const seconds = 59 - now.getSeconds();
+
+  updateCard(cards.yil, years);
+  updateCard(cards.ay, months);
+  updateCard(cards.gun, days);
+  updateCard(cards.saat, hours);
+  updateCard(cards.dakika, minutes);
+  updateCard(cards.saniye, seconds);
+}
+
+const labels = [
+  ["yil", "Yıl"],
+  ["ay", "Ay"],
+  ["gun", "Gün"],
+  ["saat", "Saat"],
+  ["dakika", "Dakika"],
+  ["saniye", "Saniye"]
+];
+
+const cards = {};
+const container = document.getElementById("countdown");
+
+labels.forEach(([key, label]) => {
+  cards[key] = createCard(key, label);
+  container.appendChild(cards[key]);
+});
+
+setInterval(updateCountdown, 1000);
+updateCountdown();
+</script>
+
+</body>
+</html>
