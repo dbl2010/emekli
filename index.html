@@ -21,9 +21,8 @@
   }
 
   #countdown {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 25px;
     max-width: 900px;
     margin: 0 auto;
@@ -32,38 +31,68 @@
   .flip-card {
     width: 150px;
     height: 150px;
-    perspective: 1000px;
-  }
-
-  .flip-inner {
     position: relative;
-    width: 100%;
-    height: 100%;
-    transform-style: preserve-3d;
-    transition: transform 0.6s ease-in-out;
   }
 
-  .flip-card.flipped .flip-inner {
-    transform: rotateX(-180deg);
-  }
-
-  .flip-front, .flip-back {
+  .top, .bottom, .flip-top, .flip-bottom {
     position: absolute;
     width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
+    height: 50%;
+    overflow: hidden;
     background: rgba(255,255,255,0.15);
-    border-radius: 16px;
     backdrop-filter: blur(6px);
+    border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
   }
 
-  .flip-back {
+  .top {
+    top: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+  }
+
+  .bottom {
+    bottom: 0;
+    border-top: 1px solid rgba(255,255,255,0.3);
+  }
+
+  .flip-top, .flip-bottom {
+    backface-visibility: hidden;
+    transform-origin: center bottom;
+    background: rgba(255,255,255,0.15);
+  }
+
+  .flip-top {
+    top: 0;
+    z-index: 5;
+    transform-origin: bottom;
+  }
+
+  .flip-bottom {
+    bottom: 0;
+    z-index: 5;
+    transform-origin: top;
     transform: rotateX(180deg);
+  }
+
+  .animate .flip-top {
+    animation: flipTop 0.3s linear forwards;
+  }
+
+  .animate .flip-bottom {
+    animation: flipBottom 0.3s linear forwards;
+  }
+
+  @keyframes flipTop {
+    0% { transform: rotateX(0deg); }
+    100% { transform: rotateX(-90deg); }
+  }
+
+  @keyframes flipBottom {
+    0% { transform: rotateX(90deg); }
+    100% { transform: rotateX(0deg); }
   }
 
   .number {
@@ -75,9 +104,13 @@
     font-size: 18px;
     opacity: 0.9;
     margin-top: 8px;
+    text-align: center;
   }
 
   @media (max-width: 480px) {
+    #countdown {
+      grid-template-columns: repeat(2, 1fr);
+    }
     .flip-card {
       width: 120px;
       height: 120px;
@@ -107,33 +140,33 @@ function createCard(key, label) {
   card.dataset.key = key;
 
   card.innerHTML = `
-    <div class="flip-inner">
-      <div class="flip-front">
-        <div class="number">0</div>
-        <div class="label">${label}</div>
-      </div>
-      <div class="flip-back">
-        <div class="number">0</div>
-        <div class="label">${label}</div>
-      </div>
-    </div>
+    <div class="top"><div class="number">0</div></div>
+    <div class="bottom"><div class="number">0</div></div>
+    <div class="flip-top"><div class="number">0</div></div>
+    <div class="flip-bottom"><div class="number">0</div></div>
+    <div class="label">${label}</div>
   `;
   return card;
 }
 
 function updateCard(card, newValue) {
-  const front = card.querySelector(".flip-front .number");
-  const back = card.querySelector(".flip-back .number");
+  const top = card.querySelector(".top .number");
+  const bottom = card.querySelector(".bottom .number");
+  const flipTop = card.querySelector(".flip-top .number");
+  const flipBottom = card.querySelector(".flip-bottom .number");
 
-  if (front.textContent !== newValue.toString()) {
-    back.textContent = newValue;
-    card.classList.add("flipped");
+  if (top.textContent === newValue.toString()) return;
 
-    setTimeout(() => {
-      front.textContent = newValue;
-      card.classList.remove("flipped");
-    }, 600);
-  }
+  flipTop.textContent = top.textContent;
+  flipBottom.textContent = newValue;
+
+  card.classList.add("animate");
+
+  setTimeout(() => {
+    top.textContent = newValue;
+    bottom.textContent = newValue;
+    card.classList.remove("animate");
+  }, 600);
 }
 
 function updateCountdown() {
