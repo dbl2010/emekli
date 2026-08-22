@@ -11,7 +11,8 @@
   :root{
     --flip-speed: 0.3s;
     --box-size: 160px;
-    --radius: 14px;
+    --col-gap: 30px;
+    --row-gap: 26px;
     --text: #f2efe4;
     --label: rgba(242,239,228,0.6);
     --flap-light: #3a3e46;
@@ -118,9 +119,12 @@
   /* ---------- Grid ---------- */
   .clock-grid{
     display:grid;
-    grid-template-columns:repeat(3, var(--box-size));
-    grid-auto-rows:var(--box-size);
-    gap:26px 30px;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    grid-auto-rows:auto;
+    gap:var(--row-gap) var(--col-gap);
+    width:100%;
+    max-width:calc(var(--box-size) * 3 + var(--col-gap) * 2);
+    margin:0 auto;
   }
 
   .flap-unit{
@@ -128,6 +132,8 @@
     flex-direction:column;
     align-items:center;
     gap:12px;
+    width:100%;
+    min-width:0;
   }
 
   .flap-unit .label{
@@ -141,9 +147,10 @@
   /* ---------- Flap card ---------- */
   .flap-card{
     position:relative;
-    width:var(--box-size);
-    height:var(--box-size);
-    border-radius:var(--radius);
+    width:100%;
+    aspect-ratio:1 / 1;
+    container-type:inline-size;
+    border-radius:9%;
     overflow:hidden;
     perspective:480px;
     box-shadow:var(--card-shadow-rest);
@@ -195,7 +202,7 @@
     justify-content:center;
     font-family:'Space Grotesk', sans-serif;
     font-weight:700;
-    font-size:74px;
+    font-size:46cqw;
     line-height:1;
     color:var(--text);
     font-variant-numeric:tabular-nums;
@@ -265,12 +272,15 @@
   }
 
   @media (max-width:640px){
-    :root{ --box-size:98px; --radius:11px; }
-    .half .digit{ font-size:44px; }
-    .clock-grid{ gap:16px 16px; }
-    .panel{ padding:30px 20px 26px; }
+    :root{ --col-gap:14px; --row-gap:16px; }
+    .panel{ padding:26px 16px 22px; }
     header h1{ font-size:20px; }
     .flap-unit .label{ font-size:10px; letter-spacing:2.5px; }
+  }
+
+  @media (max-width:360px){
+    :root{ --col-gap:10px; --row-gap:12px; }
+    .panel{ padding:20px 12px 18px; }
   }
 </style>
 </head>
@@ -278,8 +288,9 @@
 
   <div class="panel">
     <header>
-      <div class="eyebrow">DBL'nin Emekliliğine Kalan Zaman</div>
-      <div class="target-line">HEDEF <span class="dot">·</span><span id="target-date">07 ŞUB 2036</span><span class="dot">·</span><span id="target-time">17:00</span></div>
+     <div class="eyebrow">DBL'nin Emekliliğine Kalan Zaman</div>
+      
+      
     </header>
 
     <div class="clock-grid">
@@ -346,6 +357,7 @@
 
     <div class="reached-banner" id="reached-banner">✦ HEDEF TARİHE ULAŞILDI ✦</div>
 
+    <div class="target-line">HEDEF <span class="dot">·</span><span id="target-date">07 ŞUB 2036</span><span class="dot">·</span><span id="target-time">17:00</span></div>
   </div>
 
 <script>
