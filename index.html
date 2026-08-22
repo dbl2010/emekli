@@ -271,6 +271,528 @@
     margin-top:20px;
   }
 
+  @media (max-width:640px){
+    :root{ --col-gap:14px; --row-gap:16px; }
+    .panel{ padding:26px 16px 22px; }
+    header h1{ font-size:20px; }
+    .flap-unit .label{ font-size:10px; letter-spacing:2.5px; }
+  }
+
+  @media (max-width:360px){
+    :root{ --col-gap:10px; --row-gap:12px; }
+    .panel{ padding:20px 12px 18px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="panel">
+    <header>
+     <div class="eyebrow">DBL'nin Emekliliğine Kalan Zaman</div>
+      
+      
+    </header>
+
+    <div class="clock-grid">
+      <div class="flap-unit">
+        <div class="flap-card" id="box-years" data-value="00">
+          <div class="half top-half card-face"><span class="digit">00</span></div>
+          <div class="half bottom-half card-face"><span class="digit">00</span></div>
+          <div class="half top-half flip-top"><span class="digit"></span></div>
+          <div class="half bottom-half flip-bottom"><span class="digit"></span></div>
+        </div>
+        <div class="label">YIL</div>
+      </div>
+
+      <div class="flap-unit">
+        <div class="flap-card" id="box-months" data-value="00">
+          <div class="half top-half card-face"><span class="digit">00</span></div>
+          <div class="half bottom-half card-face"><span class="digit">00</span></div>
+          <div class="half top-half flip-top"><span class="digit"></span></div>
+          <div class="half bottom-half flip-bottom"><span class="digit"></span></div>
+        </div>
+        <div class="label">AY</div>
+      </div>
+
+      <div class="flap-unit">
+        <div class="flap-card" id="box-days" data-value="00">
+          <div class="half top-half card-face"><span class="digit">00</span></div>
+          <div class="half bottom-half card-face"><span class="digit">00</span></div>
+          <div class="half top-half flip-top"><span class="digit"></span></div>
+          <div class="half bottom-half flip-bottom"><span class="digit"></span></div>
+        </div>
+        <div class="label">GÜN</div>
+      </div>
+
+      <div class="flap-unit">
+        <div class="flap-card" id="box-hours" data-value="00">
+          <div class="half top-half card-face"><span class="digit">00</span></div>
+          <div class="half bottom-half card-face"><span class="digit">00</span></div>
+          <div class="half top-half flip-top"><span class="digit"></span></div>
+          <div class="half bottom-half flip-bottom"><span class="digit"></span></div>
+        </div>
+        <div class="label">SAAT</div>
+      </div>
+
+      <div class="flap-unit">
+        <div class="flap-card" id="box-minutes" data-value="00">
+          <div class="half top-half card-face"><span class="digit">00</span></div>
+          <div class="half bottom-half card-face"><span class="digit">00</span></div>
+          <div class="half top-half flip-top"><span class="digit"></span></div>
+          <div class="half bottom-half flip-bottom"><span class="digit"></span></div>
+        </div>
+        <div class="label">DAKİKA</div>
+      </div>
+
+      <div class="flap-unit">
+        <div class="flap-card" id="box-seconds" data-value="00">
+          <div class="half top-half card-face"><span class="digit">00</span></div>
+          <div class="half bottom-half card-face"><span class="digit">00</span></div>
+          <div class="half top-half flip-top"><span class="digit"></span></div>
+          <div class="half bottom-half flip-bottom"><span class="digit"></span></div>
+        </div>
+        <div class="label">SANİYE</div>
+      </div>
+    </div>
+
+    <div class="reached-banner" id="reached-banner">✦ HEDEF TARİHE ULAŞILDI ✦</div>
+
+    <div class="eyebrow" style="margin-top: 20px;">HEDEF <span class="dot">·</span><span id="target-date">07 ŞUB 2036</span><span class="dot">·</span><span id="target-time">17:00</span></div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------------------------------------------------
+     1) ARKA PLAN — her sayfa yüklemesinde farklı bir "terminal
+        atmosferi" seçilir (glassmorphism panel her birinde iyi
+        okunur şekilde tasarlandı).
+  --------------------------------------------------------- */
+  var backgrounds = [
+    "linear-gradient(150deg, #05070d 0%, #0d1b2a 45%, #142c40 100%)",   // Gece
+    "linear-gradient(150deg, #1a1423 0%, #4a2545 45%, #b5673f 100%)",   // Şafak
+    "linear-gradient(150deg, #0f1b2d 0%, #23324a 45%, #3f5a68 100%)",   // Alacakaranlık
+    "linear-gradient(150deg, #060a12 0%, #16222f 45%, #2c4257 100%)",   // Kış
+    "linear-gradient(150deg, #0a0a0d 0%, #232629 45%, #35474a 100%)",   // Fırtına
+    "linear-gradient(150deg, #170f1f 0%, #3a1f3d 45%, #6b3a3a 100%)"    // Yaz Gecesi
+  ];
+  document.body.style.background = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+
+  /* ---------------------------------------------------------
+     2) HEDEF TARİH
+  --------------------------------------------------------- */
+  var TARGET = new Date(2036, 1, 7, 17, 0, 0, 0); // Ay indeksi 0-tabanlı: 1 = Şubat
+
+  var boxIds = ["years", "months", "days", "hours", "minutes", "seconds"];
+
+  function pad(n){
+    n = Math.max(0, n);
+    return n < 10 ? "0" + n : String(n);
+  }
+
+  function computeRemaining(now){
+    if (TARGET <= now){
+      return { years:0, months:0, days:0, hours:0, minutes:0, seconds:0, reached:true };
+    }
+
+    var years   = TARGET.getFullYear() - now.getFullYear();
+    var months  = TARGET.getMonth()    - now.getMonth();
+    var days    = TARGET.getDate()     - now.getDate();
+    var hours   = TARGET.getHours()    - now.getHours();
+    var minutes = TARGET.getMinutes()  - now.getMinutes();
+    var seconds = TARGET.getSeconds()  - now.getSeconds();
+
+    if (seconds < 0){ seconds += 60; minutes--; }
+    if (minutes < 0){ minutes += 60; hours--; }
+    if (hours   < 0){ hours   += 24; days--; }
+
+    if (days < 0){
+      months--;
+      // Hedef ayından bir önceki ayın gün sayısı (borrow için doğru değer)
+      var daysInPrevMonth = new Date(TARGET.getFullYear(), TARGET.getMonth(), 0).getDate();
+      days += daysInPrevMonth;
+    }
+
+    if (months < 0){ months += 12; years--; }
+
+    return { years:years, months:months, days:days, hours:hours, minutes:minutes, seconds:seconds, reached:false };
+  }
+
+  /* ---------------------------------------------------------
+     3) FLAP KARTI — ilk çizim (animasyonsuz) ve flip (animasyonlu)
+  --------------------------------------------------------- */
+  function setInitial(box, value){
+    box.dataset.value = value;
+    box.querySelector(".card-face.top-half .digit").textContent = value;
+    box.querySelector(".card-face.bottom-half .digit").textContent = value;
+    box.querySelector(".flip-top .digit").textContent = value;
+    box.querySelector(".flip-bottom .digit").textContent = value;
+  }
+
+  function flip(box, newValue){
+    if (box.dataset.value === newValue) return;
+    var oldValue = box.dataset.value;
+    box.dataset.value = newValue;
+
+    var topFace    = box.querySelector(".card-face.top-half .digit");
+    var bottomFace = box.querySelector(".card-face.bottom-half .digit");
+    var flipTop    = box.querySelector(".flip-top");
+    var flipTopD   = flipTop.querySelector(".digit");
+    var flipBottom = box.querySelector(".flip-bottom");
+    var flipBottomD= flipBottom.querySelector(".digit");
+
+    // Hazırlık: üst flap eski değeri gösterir, alt flap yeni değeri (henüz gizli)
+    flipTopD.textContent = oldValue;
+    flipBottomD.textContent = newValue;
+    topFace.textContent = newValue; // üst flap düşünce ortaya çıkacak
+
+    flipTop.classList.remove("playing");
+    flipBottom.classList.remove("playing");
+    void flipTop.offsetWidth; // reflow — animasyonun yeniden başlayabilmesi için
+
+    box.classList.add("flipping");
+    flipTop.classList.add("playing");
+
+    function onTopEnd(){
+      flipTop.removeEventListener("animationend", onTopEnd);
+      flipTop.classList.remove("playing");
+
+      bottomFace.textContent = newValue;
+
+      void flipBottom.offsetWidth;
+      flipBottom.classList.add("playing");
+
+      function onBottomEnd(){
+        flipBottom.removeEventListener("animationend", onBottomEnd);
+        flipBottom.classList.remove("playing");
+        box.classList.remove("flipping");
+      }
+      flipBottom.addEventListener("animationend", onBottomEnd);
+    }
+    flipTop.addEventListener("animationend", onTopEnd);
+  }
+
+  /* ---------------------------------------------------------
+     4) GÜNCELLEME DÖNGÜSÜ
+  --------------------------------------------------------- */
+  var reachedBanner = document.getElementById("reached-banner");
+  var stopped = false;
+
+  function render(initial){
+    var r = computeRemaining(new Date());
+
+    var values = {
+      years:   pad(r.years),
+      months:  pad(r.months),
+      days:    pad(r.days),
+      hours:   pad(r.hours),
+      minutes: pad(r.minutes),
+      seconds: pad(r.seconds)
+    };
+
+    boxIds.forEach(function(id){
+      var box = document.getElementById("box-" + id);
+      if (initial){
+        setInitial(box, values[id]);
+      } else {
+        flip(box, values[id]);
+      }
+    });
+
+    if (r.reached && !stopped){
+      stopped = true;
+      reachedBanner.style.display = "block";
+    }
+  }
+
+  render(true);
+
+  function tick(){
+    if (stopped) return;
+    render(false);
+    var now = new Date();
+    var delay = 1000 - now.getMilliseconds();
+    setTimeout(tick, delay);
+  }
+  setTimeout(tick, 1000 - new Date().getMilliseconds());
+
+})();
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geri Sayım · Split-Flap Pano</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --flip-speed: 0.3s;
+    --box-size: 160px;
+    --col-gap: 30px;
+    --row-gap: 26px;
+    --text: #f2efe4;
+    --label: rgba(242,239,228,0.6);
+    --flap-light: #3a3e46;
+    --flap-dark: #1c1f24;
+    --accent: #e8a33d;
+    --accent-soft: rgba(232,163,61,0.5);
+    --card-shadow-rest: 0 10px 26px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.10);
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    height:100%;
+    margin:0;
+  }
+
+  body{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 16px;
+    font-family:'Inter', system-ui, -apple-system, sans-serif;
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    background-size:200% 200%;
+    transition:background 0.8s ease;
+    overflow-x:hidden;
+  }
+
+  /* ---------- Outer glass panel ---------- */
+  .panel{
+    position:relative;
+    background:rgba(255,255,255,0.06);
+    backdrop-filter:blur(22px);
+    -webkit-backdrop-filter:blur(22px);
+    border:1px solid rgba(255,255,255,0.14);
+    border-radius:28px;
+    padding:44px 52px 40px;
+    box-shadow:0 24px 70px rgba(0,0,0,0.4);
+    max-width:96vw;
+  }
+
+  .panel::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:28px;
+    background:linear-gradient(160deg, rgba(255,255,255,0.10), rgba(255,255,255,0) 40%);
+    pointer-events:none;
+  }
+
+  header{
+    text-align:center;
+    margin-bottom:34px;
+    user-select:none;
+  }
+
+  header .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    font-family:'Inter', sans-serif;
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:3px;
+    color:var(--accent);
+    margin-bottom:10px;
+  }
+
+  header .eyebrow::before,
+  header .eyebrow::after{
+    content:"";
+    width:20px;
+    height:1px;
+    background:var(--accent-soft);
+  }
+
+  header h1{
+    margin:0;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:26px;
+    letter-spacing:1px;
+  }
+
+  header .target-line{
+    margin-top:10px;
+    font-size:12px;
+    letter-spacing:2px;
+    color:var(--label);
+    font-weight:500;
+  }
+
+  header .target-line span{
+    color:var(--text);
+  }
+
+  header .target-line .dot{
+    color:var(--accent-soft);
+    margin:0 8px;
+  }
+
+  /* ---------- Grid ---------- */
+  .clock-grid{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    grid-auto-rows:auto;
+    gap:var(--row-gap) var(--col-gap);
+    width:100%;
+    max-width:calc(var(--box-size) * 3 + var(--col-gap) * 2);
+    margin:0 auto;
+  }
+
+  .flap-unit{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+    width:100%;
+    min-width:0;
+  }
+
+  .flap-unit .label{
+    font-family:'Inter', sans-serif;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:3.5px;
+    color:var(--label);
+  }
+
+  /* ---------- Flap card ---------- */
+  .flap-card{
+    position:relative;
+    width:100%;
+    aspect-ratio:1 / 1;
+    container-type:inline-size;
+    border-radius:9%;
+    overflow:hidden;
+    perspective:480px;
+    box-shadow:var(--card-shadow-rest);
+    border:1px solid rgba(255,255,255,0.16);
+  }
+
+  .flap-card::after{
+    /* mechanical seam line, always on top */
+    content:"";
+    position:absolute;
+    left:0; right:0; top:50%;
+    height:2px;
+    transform:translateY(-50%);
+    background:rgba(0,0,0,0.55);
+    z-index:10;
+    pointer-events:none;
+  }
+
+  .flap-card.flipping{
+    box-shadow:var(--card-shadow-rest), 0 18px 22px -8px rgba(0,0,0,0.55);
+  }
+
+  .half{
+    position:absolute;
+    left:0;
+    width:100%;
+    height:50%;
+    overflow:hidden;
+  }
+
+  .top-half{
+    top:0;
+    background:linear-gradient(to bottom, var(--flap-light) 0%, var(--flap-dark) 100%);
+    box-shadow:inset 0 -10px 12px -8px rgba(0,0,0,0.6);
+  }
+  .bottom-half{
+    bottom:0;
+    background:linear-gradient(to bottom, var(--flap-dark) 0%, var(--flap-light) 100%);
+    box-shadow:inset 0 10px 12px -8px rgba(0,0,0,0.6);
+  }
+
+  .half .digit{
+    position:absolute;
+    left:0; top:0;
+    width:100%;
+    height:200%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:46cqw;
+    line-height:1;
+    color:var(--text);
+    font-variant-numeric:tabular-nums;
+    user-select:none;
+  }
+
+  .bottom-half .digit{ top:-100%; }
+
+  .card-face{ z-index:1; }
+
+  .flip-top,
+  .flip-bottom{
+    z-index:5;
+    visibility:hidden;
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+    will-change:transform, filter;
+  }
+
+  .flip-top{
+    transform-origin:bottom center;
+    transform:rotateX(0deg);
+  }
+
+  .flip-bottom{
+    transform-origin:top center;
+    transform:rotateX(90deg);
+  }
+
+  .flip-top.playing{
+    visibility:visible;
+    animation:flipTopClose var(--flip-speed) cubic-bezier(0.55, 0.06, 0.9, 0.44) forwards;
+  }
+
+  .flip-bottom.playing{
+    visibility:visible;
+    animation:flipBottomOpen var(--flip-speed) cubic-bezier(0.15, 0.6, 0.35, 1) forwards;
+  }
+
+  @keyframes flipTopClose{
+    0%   { transform:rotateX(0deg);   filter:brightness(1); }
+    100% { transform:rotateX(-90deg); filter:brightness(0.46); }
+  }
+
+  @keyframes flipBottomOpen{
+    0%   { transform:rotateX(90deg); filter:brightness(0.46); }
+    100% { transform:rotateX(0deg);  filter:brightness(1); }
+  }
+
+  footer{
+    margin-top:30px;
+    text-align:center;
+    font-size:10.5px;
+    letter-spacing:2px;
+    color:var(--label);
+    user-select:none;
+  }
+
+  .reached-banner{
+    display:none;
+    text-align:center;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:18px;
+    letter-spacing:2px;
+    color:var(--accent);
+    margin-top:20px;
+  }
+
   .music-embed{
     margin-top:24px;
   }
